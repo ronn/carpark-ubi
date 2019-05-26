@@ -1,8 +1,8 @@
 package com.ubitricity.carparkubi;
 
 import com.ubitricity.carparkubi.domain.ChargingPoint;
-import com.ubitricity.carparkubi.service.ChargingPointService;
 import com.ubitricity.carparkubi.domain.ChargingPointId;
+import com.ubitricity.carparkubi.service.ChargingPointService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
