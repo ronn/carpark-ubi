@@ -27,7 +27,7 @@ public class CarparkUbiController {
 
     @PutMapping("/plug/{cpId}")
     public ResponseEntity<Report> plug(@PathVariable String cpId){
-        return service.getChargingPointStream()
+        return service.getChargingPoint()
                 .filter(chargingPoint -> cpId.equals(chargingPoint.getId().name()))
                 .findFirst()
                 .map(chargingPoint -> {
