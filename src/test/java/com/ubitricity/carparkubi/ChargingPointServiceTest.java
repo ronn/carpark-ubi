@@ -20,7 +20,7 @@ public class ChargingPointServiceTest {
     @Before
     public void init(){
         service = Mockito.mock(ChargingPointService.class, Mockito.RETURNS_MOCKS);
-        Mockito.when(service.getChargingPointStream())
+        Mockito.when(service.getChargingPoint())
                 .thenReturn(Stream.of(
                         new ChargingPoint(ChargingPointId.CP1),
                         new ChargingPoint(ChargingPointId.CP2),
