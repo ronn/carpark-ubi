@@ -62,28 +62,16 @@ public class ChargingPointServiceImpl implements ChargingPointService {
     }
 
     private void manageNewPlug(ChargingPoint chargingPoint) {
-        ChargingPoint from = disconectIfNecessary(chargingPoint);
+        ChargingPoint cp = disconectIfNecessary(chargingPoint);
 
-        boolean distributingWasNeeded = distributingWasNeeded();
+        boolean distributingWasNeeded = distributeAmperes();
 
-        save(from.withState(State.OCCUPIED)
+        save(cp.withState(State.OCCUPIED)
                 .withChargingType(getPropperChargingType())
                 .withPlugTime(LocalDateTime.now())
         );
 
         distributeIfNotFull(distributingWasNeeded);
-    }
-
-    private void distributeIfNotFull(boolean distributingWasNeeded) {
-
-
-        if (distributingWasNeeded && getTotalUsedAmperes() < Constants.OVERALL_CURRENT_INPUT){
-            getChargingPoint()
-                    .filter(cp -> ChargingType.SLOW_CHARGING.equals(cp.getChargingType().orElse(ChargingType.FAST_CHARGING)))
-                    .max(Comparator.comparing(a -> a.getPlugTime().orElse(LocalDateTime.now())))
-                    .map(cp -> cp.withChargingType(ChargingType.FAST_CHARGING))
-                    .ifPresent(this::save);
-        }
     }
 
     private ChargingType getPropperChargingType() {
@@ -92,7 +80,7 @@ public class ChargingPointServiceImpl implements ChargingPointService {
                 : ChargingType.FAST_CHARGING;
     }
 
-    private boolean distributingWasNeeded() {
+    private boolean distributeAmperes() {
         if (getTotalUsedAmperes() > Constants.MAXIMUM_AMPERES_WITHOUT_DISTRIBUTING ){
             getChargingPoint()
                     .filter(cp -> cp.getChargingType().orElse(ChargingType.SLOW_CHARGING).equals(ChargingType.FAST_CHARGING))
@@ -104,6 +92,16 @@ public class ChargingPointServiceImpl implements ChargingPointService {
         }
 
         return false;
+    }
+
+    private void distributeIfNotFull(boolean distributingWasNeeded) {
+        if (distributingWasNeeded && getTotalUsedAmperes() < Constants.OVERALL_CURRENT_INPUT){
+            getChargingPoint()
+                    .filter(cp -> ChargingType.SLOW_CHARGING.equals(cp.getChargingType().orElse(ChargingType.FAST_CHARGING)))
+                    .max(Comparator.comparing(a -> a.getPlugTime().orElse(LocalDateTime.now())))
+                    .map(cp -> cp.withChargingType(ChargingType.FAST_CHARGING))
+                    .ifPresent(this::save);
+        }
     }
 
     private ChargingPoint disconectIfNecessary(ChargingPoint chargingPoint) {
